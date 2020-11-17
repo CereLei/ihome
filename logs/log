@@ -1,0 +1,38 @@
+INFO _internal.py:113  * Restarting with stat
+WARNING _internal.py:113  * Debugger is active!
+INFO _internal.py:113  * Debugger PIN: 121-423-627
+INFO _internal.py:113  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:49:02] "[33mGET / HTTP/1.1[0m" 404 -
+ERROR demo.py:7 1111
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:49:12] "[35m[1mGET /api/index HTTP/1.1[0m" 500 -
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:49:12] "[37mGET /api/index?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1[0m" 200 -
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:49:12] "[37mGET /api/index?__debugger__=yes&cmd=resource&f=jquery.js HTTP/1.1[0m" 200 -
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:49:12] "[37mGET /api/index?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1[0m" 200 -
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:49:12] "[37mGET /api/index?__debugger__=yes&cmd=resource&f=ubuntu.ttf HTTP/1.1[0m" 200 -
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:49:12] "[37mGET /api/index?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 200 -
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:49:13] "[37mGET /api/index?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1[0m" 200 -
+INFO _internal.py:113  * Detected change in 'D:\\test\\python\\flask\\IHome\\ihome\\api\\demo.py', reloading
+INFO _internal.py:113  * Restarting with stat
+WARNING _internal.py:113  * Debugger is active!
+INFO _internal.py:113  * Debugger PIN: 121-423-627
+INFO _internal.py:113  * Running on http://127.0.0.1:5000/ (Press CTRL+C to quit)
+ERROR demo.py:7 1111
+WARNING demo.py:8 1111
+INFO demo.py:9 1111
+DEBUG demo.py:10 1111
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:50:04] "[37mGET /api/index HTTP/1.1[0m" 200 -
+ERROR demo.py:7 1111
+WARNING demo.py:8 1111
+INFO demo.py:9 1111
+DEBUG demo.py:10 1111
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:50:17] "[37mGET /api/index HTTP/1.1[0m" 200 -
+ERROR demo.py:7 1111
+WARNING demo.py:8 1111
+INFO demo.py:9 1111
+DEBUG demo.py:10 1111
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:50:19] "[37mGET /api/index HTTP/1.1[0m" 200 -
+ERROR demo.py:7 1111
+WARNING demo.py:8 1111
+INFO demo.py:9 1111
+DEBUG demo.py:10 1111
+INFO _internal.py:113 127.0.0.1 - - [16/Nov/2020 17:50:22] "[37mGET /api/index HTTP/1.1[0m" 200 -
