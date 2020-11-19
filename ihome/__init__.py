@@ -54,5 +54,5 @@ def create_app(config_name):
     # 注册蓝图
     from ihome import api  # 绝对路径导入
     app.register_blueprint(api.api, url_prefix="/api")
-    print(app.url_map)
+    # print(app.url_map)
     return app

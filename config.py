@@ -21,7 +21,7 @@ class Config(object):
     PERMANENT_SESSION_LIFETIME = 86400 # session的有效期，单位秒
 
 class DevelopmentConfig(Config):
-    DEBUG = True
+    DEBUG = True # 如果开启DEBUG模式，无论日志等级设置多少，都已DEBUG等级优先
 
 class ProductionConfig(Config):
     pass
