@@ -8,6 +8,7 @@ from flask_wtf import CSRFProtect
 import redis
 import logging
 from logging.handlers import RotatingFileHandler
+from ihome.utils.common import ReConverter
 
 
 # db,redis放在外面，是为了方便其他文件导入使用
@@ -51,8 +52,16 @@ def create_app(config_name):
     # 为flask补充csrf防控
     CSRFProtect(app)
 
+    # 为 flask 添加自定义的转化器
+    app.url_map.converters['re'] = ReConverter
+
     # 注册蓝图
     from ihome import api  # 绝对路径导入
     app.register_blueprint(api.api, url_prefix="/api")
+
+    # 提供静态资源的蓝图
+    from ihome import web_html
+    app.register_blueprint(web_html.html)
+
     # print(app.url_map)
     return app
