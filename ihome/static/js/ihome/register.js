@@ -24,7 +24,7 @@ function generateImageCode() {
     // 1. 生成图片验证码编号
     imageCodeId = generateUUID();
     // 是指图片url
-    var url = "/api/v1.0/image_codes/" + imageCodeId;
+    var url = "/api/image_codes/" + imageCodeId;
     $(".image-code img").attr("src", url);
 }
 
@@ -44,7 +44,7 @@ function sendSMSCode() {
         $(".phonecode-a").attr("onclick", "sendSMSCode();");
         return;
     }
-    $.get("/api/smscode", {mobile:mobile, code:imageCode, codeId:imageCodeId}, 
+    $.get("/api/sms_codes", {mobile:mobile, image_code:imageCode, image_code_id:imageCodeId},
         function(data){
             if (0 != data.errno) {
                 $("#image-code-err span").html(data.errmsg); 
