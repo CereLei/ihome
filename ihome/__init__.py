@@ -44,7 +44,7 @@ def create_app(config_name):
 
     # 初始化redis工具
     global redis_store
-    redis_store = redis.StrictRedis(host=config_cls.REDIS_HOST,port=config_cls.REDIS_PORT)
+    redis_store = redis.StrictRedis(host=config_cls.REDIS_HOST,port=config_cls.REDIS_PORT,decode_responses=True)
 
     # 利用flask-session，将session保存到redis中
     Session(app)

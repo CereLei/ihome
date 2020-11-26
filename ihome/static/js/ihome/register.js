@@ -113,6 +113,32 @@ $(document).ready(function() {
             $("#password2-err span").html("两次密码不一致!");
             $("#password2-err").show();
             return;
-        }
+        };
+        // 调用ajax向后端发送注册请求
+        var req_data = {
+            mobile: mobile,
+            sms_code: phoneCode,
+            password: passwd,
+            password2: passwd2,
+        };
+        var req_json = JSON.stringify(req_data);
+        $.ajax({
+            url: "/api/users",
+            type: "post",
+            data: req_json,
+            contentType: "application/json",
+            dataType: "json",
+            headers: {
+                "X-CSRFToken": getCookie("csrf_token")
+            }, // 请求头，将csrf_token值放到请求中，方便后端csrf进行验证
+            success: function (resp) {
+                if (resp.errno == "0") {
+                    // 注册成功，跳转到主页
+                    location.href = "/index.html";
+                } else {
+                    alert(resp.errmsg);
+                }
+            }
+        })
     });
 })

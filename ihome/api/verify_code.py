@@ -7,7 +7,7 @@ from ihome.utils.response_code import RET
 from ihome.utils.SendMessage import CCP
 from ihome.models import User
 import random
-
+import re
 # 127.0.0.1/api/v1.0/image_code/image_code_id
 @api.route('/image_codes/<image_code_id>')
 def get_image_code(image_code_id):
@@ -42,16 +42,20 @@ def get_image_code(image_code_id):
     return resp
 
 # GET /api/sms_codes/<mobile>?image_code=xxxxx&image_code_id=xxxxx
-@api.route("/sms_codes/<re(r'1[34578]\d{9}'):mobile>")
-def get_sms_code(mobile):
+@api.route("/sms_codes")
+def get_sms_code():
     """获取短信验证码"""
     # 获取参数
+    mobile = request.args.get("mobile")
     image_code = request.args.get("image_code")
     image_code_id = request.args.get("image_code_id")
 
-    if not all([image_code,image_code_id]):
+    if not all([mobile,image_code,image_code_id]):
         # 表示参数不完整
         return jsonify(errno=RET.PARAMERR,errmsg='参数不完整')
+
+    if re.search('1[345789]\d{9}',mobile) is None:
+        return jsonify(errno=RET.DATAERR,errmsg='手机号格式不对')
 
     # 业务逻辑处理
     # 从redis中取出真实的图片验证码--(凡是redis操作都需要写try)
@@ -121,4 +125,3 @@ def get_sms_code(mobile):
         return jsonify(errno=RET.OK, errmsg="发送成功")
     else:
         return jsonify(errno=RET.THIRDERR, errmsg="发送失败")
-
