@@ -34,7 +34,7 @@ def get_image_code(image_code_id):
     except Exception as e:
         # 记录日志
         current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR,  errmsg="保存图片验证码失败")
+        return jsonify(code=RET.DBERR,  errmsg="保存图片验证码失败")
 
     # 返回值
     resp = make_response(image_data)
@@ -52,10 +52,10 @@ def get_sms_code():
 
     if not all([mobile,image_code,image_code_id]):
         # 表示参数不完整
-        return jsonify(errno=RET.PARAMERR,errmsg='参数不完整')
+        return jsonify(code=RET.PARAMERR,errmsg='参数不完整')
 
     if re.search('1[345789]\d{9}',mobile) is None:
-        return jsonify(errno=RET.DATAERR,errmsg='手机号格式不对')
+        return jsonify(code=RET.DATAERR,errmsg='手机号格式不对')
 
     # 业务逻辑处理
     # 从redis中取出真实的图片验证码--(凡是redis操作都需要写try)
@@ -63,11 +63,11 @@ def get_sms_code():
         real_image_code = redis_store.get("image_code_%s" % image_code_id)
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.DATAERR,errmsg='redis 数据错误')
+        return jsonify(code=RET.DATAERR,errmsg='redis 数据错误')
 
     # 判断图片验证码是否过期
     if real_image_code is None:
-        return jsonify(errno=RET.NODATA,errmsg='验证码过期')
+        return jsonify(code=RET.NODATA,errmsg='验证码过期')
 
     # 删除redis中的图片验证码，防止用户使用同一个图片验证码验证多次
     try:
@@ -77,7 +77,7 @@ def get_sms_code():
 
     # 与用户填写的值进行对比
     if real_image_code.lower() != image_code.lower():
-        return jsonify(errno=RET.DATAERR,errmsg='验证码输入错误')
+        return jsonify(code=RET.DATAERR,errmsg='验证码输入错误')
 
     # 判断对于这个手机号的操作，在60秒内有没有之前的记录，如果有，则认为用户操作频繁，不接受处理
     try:
@@ -87,7 +87,7 @@ def get_sms_code():
     else:
         if send_flag is not None:
             # 表示在60秒内之前有过发送的记录
-            return jsonify(errno=RET.REQERR, errmsg="请求过于频繁，请60秒后重试")
+            return jsonify(code=RET.REQERR, errmsg="请求过于频繁，请60秒后重试")
 
 
     # 判断手机号是否存在-从数据库查-(存在则返回数据，不存在则返回None)
@@ -98,7 +98,7 @@ def get_sms_code():
     else:
         if user is not None:
             # 表示数据库存在
-            return jsonify(errno=RET.DATAERR,errmsg='手机号已经存在')
+            return jsonify(code=RET.DATAERR,errmsg='手机号已经存在')
     # 如果手机号不存在，则生成验证码-6为数字，不足补0
     sms_code = "%06d" % random.randint(0,999999)
 
@@ -109,7 +109,7 @@ def get_sms_code():
         redis_store.setex("send_sms_code_%s" % mobile, constants.SEND_SMS_CODE_INTERVAL, 1)
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR, errmsg="保存短信验证码异常")
+        return jsonify(code=RET.DBERR, errmsg="保存短信验证码异常")
 
     # 发送短信
     try:
@@ -117,11 +117,11 @@ def get_sms_code():
         result = ccp.send_message(1,mobile,(sms_code,int(constants.SMS_CODE_REDIS_EXPIRES/60)))
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.THIRDERR,errmsg="发送异常")
+        return jsonify(code=RET.THIRDERR,errmsg="发送异常")
 
     # 返回值
     if result == 0:
         # 发送成功
-        return jsonify(errno=RET.OK, errmsg="发送成功")
+        return jsonify(code=RET.OK, errmsg="发送成功")
     else:
-        return jsonify(errno=RET.THIRDERR, errmsg="发送失败")
+        return jsonify(code=RET.THIRDERR, errmsg="发送失败")

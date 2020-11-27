@@ -1,9 +1,9 @@
 # coding:utf-8
 
 class RET:
-    OK                  = "0"
-    DBERR               = "4001"
-    NODATA              = "4002"
+    OK                  = "200"
+    DBERR               = "500"
+    NODATA              = "422"
     DATAEXIST           = "4003"
     DATAERR             = "4004"
     SESSIONERR          = "4101"

@@ -8,3 +8,6 @@ SMS_CODE_REDIS_EXPIRES = 300
 
 # 发送短信验证码间隔--短信redis发送60秒之后，才可以发送
 SEND_SMS_CODE_INTERVAL = 60
+
+# 登录最大的次数-防止暴力测试
+LOGIN_ERROR_MAX_TIMES =5

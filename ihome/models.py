@@ -2,7 +2,7 @@
 
 from datetime import datetime
 from . import db
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash,check_password_hash
 
 
 class BaseModel(object):
@@ -51,6 +51,8 @@ class User(BaseModel, db.Model):
         """
         self.password_hash = generate_password_hash(value)
 
+    def check_password(self,passwd):
+        return check_password_hash(self.password_hash,passwd)
 
 
 class Area(BaseModel, db.Model):
