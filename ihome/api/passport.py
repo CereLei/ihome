@@ -164,5 +164,15 @@ def get_login():
 def check_login():
     """检查登录状态"""
     name = session.get("name")
-    print(name)
-    return '1'
+    # 如果session中数据name名字存在，则表示用户已登录，否则未登录
+    if name is not None:
+        return jsonify(code=RET.OK, errmsg="true", data={"name": name})
+    else:
+        return jsonify(code=RET.SESSIONERR, errmsg="用户未登录")
+
+@api.route("/session",methods=["DELETE"])
+def logout():
+    """登出"""
+    # 清空session
+    session.clear()
+    return jsonify(code=RET.OK,errmsg="退出成功")
