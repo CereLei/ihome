@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 
 from flask_session import Session
 from flask_wtf import CSRFProtect
+from flask_cors import CORS
 
 import redis
 import logging
@@ -51,6 +52,9 @@ def create_app(config_name):
 
     # 为flask补充csrf防控
     # CSRFProtect(app)
+
+    #配置全局路由
+    CORS(app,supports_credentials=True)
 
     # 为 flask 添加自定义的转化器
     app.url_map.converters['re'] = ReConverter

@@ -37,10 +37,9 @@ class User(BaseModel, db.Model):
         """读取属性的函数行为"""
         # print(user.password)  # 读取属性时被调用
         # 函数的返回值会作为属性值
-        # return "xxxx"
+        # return self.name
         # 读取没意义，直接抛出异常，只能设置不能读取
         raise AttributeError("这个属性只能设置，不能读取")
-
     # 使用这个装饰器, 对应设置属性操作
     @password.setter
     def password(self, value):
@@ -64,6 +63,12 @@ class Area(BaseModel, db.Model):
     name = db.Column(db.String(32), nullable=False)  # 区域名字
     houses = db.relationship("House", backref="area")  # 区域的房屋
 
+    def to_dict(self):
+        d = {
+            "aid":self.id,
+            "aname":self.name
+        }
+        return d
 
 # 房屋设施表，建立房屋与设施的多对多关系
 house_facility = db.Table(
