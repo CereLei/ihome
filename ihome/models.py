@@ -53,6 +53,15 @@ class User(BaseModel, db.Model):
     def check_password(self,passwd):
         return check_password_hash(self.password_hash,passwd)
 
+    def auth_to_dict(self):
+        """将实名信息转换为字典数据"""
+        auth_dict = {
+            "user_id":self.id,
+            "real_name": self.real_name,
+            "id_card": self.id_card
+        }
+        return auth_dict
+
 
 class Area(BaseModel, db.Model):
     """城区"""

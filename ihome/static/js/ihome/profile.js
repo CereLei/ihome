@@ -13,7 +13,20 @@ function getCookie(name) {
 
 
 $(document).ready(function () {
+     $.get("/api/user-info",function(resp) {
+        // 用户未登录
+        if ("4101" == resp.code) {
+            location.href = "/login.html";
+        }
+        // 查询到了用户的信息
+        else if ("200" == resp.code) {
+            if (resp.data.avatar_url) {
+                var avatarUrl = resp.data.avatar_url;
+                $("#user-avatar").attr("src", avatarUrl);
+            }
 
+        }
+    }, "json")
     $("#form-avatar").submit(function (e) {
         // 阻止表单的默认行为
         e.preventDefault();
@@ -36,6 +49,35 @@ $(document).ready(function () {
             }
         })
     })
+    $("#form-name").submit(function(e){
+        e.preventDefault();
+        // 获取参数
+        var name = $("#user-name").val();
 
+        if (!name) {
+            alert("请填写用户名！");
+            return;
+        }
+        $.ajax({
+            url:"/api/users/name",
+            type:"PUT",
+            data: JSON.stringify({name: name}),
+            contentType: "application/json",
+            dataType: "json",
+            headers:{
+                "X-CSRFTOKEN":getCookie("csrf_token")
+            },
+            success: function (data) {
+                if ("200" == data.code) {
+                    $(".error-msg").hide();
+                    showSuccessMsg();
+                } else if ("4001" == data.code) {
+                    $(".error-msg").show();
+                } else if ("4101" == data.code) {
+                    location.href = "/login.html";
+                }
+            }
+        });
+    })
 })
 

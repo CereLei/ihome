@@ -4,6 +4,16 @@ function getCookie(name) {
 }
 
 $(document).ready(function(){
-    // $('.popup_con').fadeIn('fast');
-    // $('.popup_con').fadeOut('fast');
+    // 向后端获取城区信息
+    $.get("/api/areas", function (resp) {
+        if (resp.code == "200") {
+            var areas = resp.data;
+            // 使用js模板
+            var html = template("areas-tmpl", {areas: areas})
+            $("#area-id").html(html);
+        } else {
+            alert(resp.errmsg);
+        }
+
+    }, "json");
 })

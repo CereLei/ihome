@@ -25,7 +25,7 @@ $(document).ready(function(){
         else if ("200" == resp.code) {
             $("#user-name").html(resp.data.name);
             $("#user-mobile").html(resp.data.mobile);
-            if (resp.data.avatar) {
+            if (resp.data.avatar_url) {
                 $("#user-avatar")[0].style.display = "block"
                 $("#user-avatar").attr("src", resp.data.avatar_url);
             }

@@ -139,7 +139,6 @@ def get_login():
     # 查询数据库--从数据库中根据手机号查询用户的数据对象
     try:
         user = User.query.filter_by(mobile=mobile).first()
-        print(user.password)
         print('*'*20)
     except Exception as e:
         current_app.logger.error(e)
