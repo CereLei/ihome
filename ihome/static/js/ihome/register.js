@@ -46,7 +46,7 @@ function sendSMSCode() {
     }
     $.get("/api/sms_codes", {mobile:mobile, image_code:imageCode, image_code_id:imageCodeId},
         function(data){
-            if (0 != data.code) {
+            if (200 != data.code) {
                 $("#image-code-err span").html(data.errmsg); 
                 $("#image-code-err").show();
                 if (2 == data.code || 3 == data.code) {
@@ -132,7 +132,7 @@ $(document).ready(function() {
                 "X-CSRFToken": getCookie("csrf_token")
             }, // 请求头，将csrf_token值放到请求中，方便后端csrf进行验证
             success: function (resp) {
-                if (resp.code == "0") {
+                if (resp.code == "200") {
                     // 注册成功，跳转到主页
                     location.href = "/index.html";
                 } else {
