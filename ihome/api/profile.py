@@ -54,7 +54,7 @@ def get_user_info():
     except Exception as e:
         current_app.logger.error(e)
         return jsonify(code=RET.OK,errmsg="用户信息获取失败")
-    return jsonify(code=RET.OK,errmsg="",data={'name':user.name,'mobile':user.mobile,'avatar_url':constants.QINIU_URL_DOMAIN + user.avatar_url})
+    return jsonify(code=RET.OK,errmsg="",data=user.to_dict())
 
 @api.route("/users/name",methods=["PUT"])
 @login_required
@@ -63,7 +63,7 @@ def change_user_name():
     user_id = g.user_id
 
     # 获取数据
-    req_data = request.json()
+    req_data = request.get_json()
     name = req_data.get("name")
     if not name:
         return jsonify(code=RET.DATAERR,errmsg="名字不能为空")

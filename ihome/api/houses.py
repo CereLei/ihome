@@ -2,9 +2,10 @@ from . import api
 from ihome.utils.common import login_required
 from flask import g, current_app, jsonify, request
 from ihome.utils.response_code import RET
-from ihome.models import Area, House, Facility, HouseImage
+from ihome.models import Area, House, Facility, HouseImage,Order
 from ihome import db, constants, redis_store
 from ihome.utils.image_storage import storage
+from datetime import datetime
 import json
 
 @api.route("/areas")
@@ -209,3 +210,67 @@ def save_house_image():
     image_url = constants.QINIU_URL_DOMAIN + file_name
 
     return jsonify(code=RET.OK,errmsg="操作成功",data={"image_url":image_url})
+
+# GET /api/v1.0/houses?sd=2017-12-01&ed=2017-12-31&aid=10&sk=new&p=1
+@api.route("/houses")
+@login_required
+def get_house_list():
+    """获取房屋的列表信息(搜索页面)"""
+    start_date = request.args.get("sd","") # 用户想要的起始时间
+    end_date = request.args.get("ed","") # 用户想要的结束时间
+    area_id = request.args.get("aid","") # 区域编号
+    sort_key = request.args.get("sk","new") # 排序关键字
+    page = request.args.get("p") # 页数
+
+    # 处理时间
+    try:
+        if start_date:
+            start_date = datetime.strftime(start_date,"%Y-%m-%d")
+        if end_date:
+            end_date = datetime.strftime(end_date,"%Y-%m-%d")
+        if start_date and end_date:
+            assert start_date<=end_date
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(code=RET.PARAMERR,errmsg="日期参数有误")
+
+    # 判断区域
+    if area_id:
+        try:
+            area = Area.query.get(area_id)
+        except Exception as e:
+            current_app.logger.error(e)
+            return jsonify(code=RET.PARAMERR,errmsg="区域参数有误")
+
+    # 过滤条件的参数列表容器--因为不知道参数有什么所有，有就存里面
+    filter_params = []
+
+    # 填充过滤参数
+    # 时间条件
+    conflict_orders = None
+    try:
+        if start_date and end_date:
+            # 查询冲突的订单
+            conflict_orders = Order.query.filter(Order.begin_date<=end_date,Order.end_date>=start_date).all()
+        elif start_date:
+            conflict_orders = Order.query.filter(Order.begin_date <= end_date).all()
+        elif end_date:
+            conflict_orders = Order.query.filter(Order.begin_date<end_date)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(code=RET.DBERR,errmsg="数据异常")
+
+    if conflict_orders:
+        # 从订单中获取冲突的房屋id
+        conflict_house_ids = [order.house_id for order in conflict_orders]
+
+        # 如果冲突的房屋id不为空，向查询参数中添加条件
+        if conflict_house_ids:
+            filter_params.append(House.id.notin_(conflict_house_ids))
+
+    # 区域条件
+    if area_id:
+        filter_params.append(House.area_id == area_id)
+
+
+    return '1'

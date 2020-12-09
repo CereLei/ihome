@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from datetime import datetime
-from . import db
+from . import db,constants
 from werkzeug.security import generate_password_hash,check_password_hash
 
 
@@ -53,6 +53,16 @@ class User(BaseModel, db.Model):
     def check_password(self,passwd):
         return check_password_hash(self.password_hash,passwd)
 
+    def to_dict(self):
+        """将对象转换为字典数据"""
+        user_dict = {
+            "user_id": self.id,
+            "name": self.name,
+            "mobile": self.mobile,
+            "avatar_url": constants.QINIU_URL_DOMAIN + self.avatar_url if self.avatar_url else "",
+            "create_time": self.create_time.strftime("%Y-%m-%d %H:%M:%S")
+        }
+        return user_dict
     def auth_to_dict(self):
         """将实名信息转换为字典数据"""
         auth_dict = {
