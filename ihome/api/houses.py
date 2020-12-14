@@ -103,14 +103,14 @@ def save_house_info():
         deposit = int(float(deposit) * 100)
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.PARAMERR, errmsg="参数错误")
+        return jsonify(code=RET.PARAMERR, errmsg="参数错误")
 
     # 判断城区id是否存在
     try:
         area = Area.query.get(area_id)
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.DBERR, errmsg="数据库异常")
+        return jsonify(code=RET.DBERR, errmsg="数据库异常")
 
     if area is None:
          return jsonify(code=RET.NODATA,errmsg="城区信息有误")
@@ -159,7 +159,7 @@ def save_house_info():
         return jsonify(code=RET.DBERR,errmsg="保存数据失败")
 
     # 保存数据成功
-    return jsonify(errno=RET.OK,errmsg="操作成功",data={"house_id":house.id})
+    return jsonify(code=RET.OK,errmsg="操作成功",data={"house_id":house.id})
 
 
 @api.route("/houses/image",methods=["POST"])
@@ -189,7 +189,7 @@ def save_house_image():
         file_name = storage(image_data)
     except Exception as e:
         current_app.logger.error(e)
-        return jsonify(errno=RET.THIRDERR,errmsg="保存图片失败")
+        return jsonify(code=RET.THIRDERR,errmsg="保存图片失败")
 
     # 保存图片信息到数据可中
     house_image = HouseImage(house_id=house_id,url=file_name)
@@ -205,7 +205,7 @@ def save_house_image():
     except Exception as e:
         current_app.logger.error(e)
         db.session.rollback()
-        return jsonify(errno=RET.DBERR,errmsg="保存图片数据异常")
+        return jsonify(code=RET.DBERR,errmsg="保存图片数据异常")
 
     image_url = constants.QINIU_URL_DOMAIN + file_name
 
@@ -271,6 +271,31 @@ def get_house_list():
     # 区域条件
     if area_id:
         filter_params.append(House.area_id == area_id)
+    house_query = None
+    # 查询操作
+    if sort_key == "booking": # 入住最多
+        house_query = House.query.filter(*filter_params).order_by(House.order_count.desc())
+    elif sort_key == "price-inc":
+        house_query = House.query.filter(*filter_params).order_by(House.price.asc())
+    elif sort_key =="price-des":
+        house_query = House.query.filter(*filter_params).order_by(House.price.desc())
+    else:
+        house_query = House.query.filter(*filter_params).order_by(House.create_time.desc())
 
+    # 分页直接在查询后的数据加paginate对象
+    try:
+        #                               当前页数必须是Int类型         每页数据量                              自动的错误输出
+        page_obj = house_query.paginate(page=int(page), per_page=constants.HOUSE_LIST_PAGE_CAPACITY, error_out=False)
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(code=RET.DBERR,errmsg="数据库错误")
+    # 获取页面数据
+    house_li = page_obj.items
+    houses = []
+    for house in house_li:
+        houses.append(house.to_basic_dict())
 
-    return '1'
+    # 获取总页数
+    total_page = page_obj.pages
+
+    return jsonify(code=RET.OK,errmsg="",data = {"total_page": total_page, "houses": houses, "current_page": page})

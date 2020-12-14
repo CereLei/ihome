@@ -17,3 +17,6 @@ QINIU_URL_DOMAIN = "http://qkl8z4v66.hd-bkt.clouddn.com/"
 
 # 城市区域的缓存时间
 AREA_INFO_REDIS_CACHE_EXPIRES = 7200
+
+# 分页每页几条
+HOUSE_LIST_PAGE_CAPACITY = 2
