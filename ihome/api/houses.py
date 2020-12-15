@@ -241,6 +241,23 @@ def get_house_list():
         except Exception as e:
             current_app.logger.error(e)
             return jsonify(code=RET.PARAMERR,errmsg="区域参数有误")
+    # 处理页数
+    try:
+        page = int(page)
+    except Exception as e:
+        current_app.logger.error(e)
+        page = 1
+
+   # 获取缓存数据
+    redis_key = "house_%s_%s_%s_%s" % (start_date, end_date, area_id, sort_key)
+    try:
+        resp_json = redis_store.hget(redis_key,page)
+    except Exception as e:
+        current_app.logger.error(e)
+    else:
+        if resp_json:
+            print("使用了缓存")
+            return resp_json,200,{"Content-Type": "application/json"}
 
     # 过滤条件的参数列表容器--因为不知道参数有什么所有，有就存里面
     filter_params = []
@@ -298,4 +315,33 @@ def get_house_list():
     # 获取总页数
     total_page = page_obj.pages
 
-    return jsonify(code=RET.OK,errmsg="",data = {"total_page": total_page, "houses": houses, "current_page": page})
+    resp_dict = dict(code=RET.OK,errmsg="",data = {"total_page": total_page, "houses": houses, "current_page": page})
+
+    resp_json = json.dumps(resp_dict)
+
+    if page <= total_page:
+        # 设置缓存数据
+        redis_key = "house_%s_%s_%s_%s" % (start_date, end_date, area_id, sort_key)
+        print("处理数据")
+        try:
+            # redis_store.hset(redis_key, page, resp_json)
+            # redis_store.expire(redis_key, constants.HOUES_LIST_PAGE_REDIS_CACHE_EXPIRES)
+            # 如何hset成功，expire失效了，这就不好，所有引入管道pipeline
+
+            # 创建redis管道对象，可以一次执行多个语句
+            pipeline = redis_store.pipeline()
+
+            # 开启多个语句的记录
+            pipeline.multi()
+
+            # 添加指令
+            pipeline.hset(redis_key, page, resp_json)
+            pipeline.expire(redis_key, constants.HOUES_LIST_PAGE_REDIS_CACHE_EXPIRES)
+
+            # 执行语句
+            pipeline.execute()
+        except Exception as e:
+            current_app.logger.error(e)
+
+
+    return resp_json, 200, {"Content-Type": "application/json"}
