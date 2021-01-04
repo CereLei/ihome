@@ -2,7 +2,7 @@ from . import api
 from ihome.utils.common import login_required
 from flask import g, current_app, jsonify, request
 from ihome.utils.response_code import RET
-from ihome.models import Area, House, Facility, HouseImage,Order
+from ihome.models import Area, House, Facility, HouseImage,Order,User
 from ihome import db, constants, redis_store
 from ihome.utils.image_storage import storage
 from datetime import datetime
@@ -345,3 +345,17 @@ def get_house_list():
 
 
     return resp_json, 200, {"Content-Type": "application/json"}
+
+@api.route("/user/house",methods=["GET"])
+@login_required
+def get_user_houses():
+    """获取房东发布的房源信息条目"""
+    user_id = g.user_id
+
+    try:
+        user = User.query.get(user_id)
+        houses = user.houses
+    except Exception as e:
+        current_app.logger.error(e)
+        return jsonify(errno=RET.DBERR,errmsg="获取数据失败")
+
